@@ -18,10 +18,26 @@
 #define MQ2_D  12
 #define MQ2_A  A0  
 
+#define CONSOLE
+#ifdef CONSOLE
+#include <Console.h>
+#define emit(s) Console.print(s);
+#define emitln(s) Console.println(s);
+#else
+#define emit(s) Serial.print(s);
+#define emitln(s) Serial.println(s);
+#endif
+
 void setup () { 
+#ifdef CONSOLE
+  Bridge.begin();
+  Console.begin();
+  while (!Console);
+#else
   Serial.begin(115200);
-  delay(5000);
-  Serial.println(F("Hello world!"));
+#endif
+
+  emitln(F("Hello world!"));
 
   pinMode(MQ2_A, INPUT); // 4v full scale or about 820
   pinMode(MQ2_D, INPUT); // active low
@@ -30,15 +46,15 @@ void setup () {
 void loop() {
   int y = analogRead(MQ2_A);
   
-  Serial.print(F("Alarm: "));
-  Serial.print(digitalRead(MQ2_D) ? F("OFF") : F("ON ")); // Adjust the onboard pot to set threshold
-  Serial.print(F(", "));
+  emit(F("Alarm: "));
+  emit(digitalRead(MQ2_D) ? F("OFF") : F("ON ")); // Adjust the onboard pot to set threshold
+  emit(F(", "));
 
-  Serial.print(y);
-  Serial.print(F("/1024 (")); 
-  Serial.print(5.0 * float(analogRead(MQ2_A)) / (1024.0 * 4.0));
-  Serial.print(F("% FS)"));
-  Serial.println();
+  emit(y);
+  emit(F("/1024 (")); 
+  emit(5.0 * float(analogRead(MQ2_A)) / (1024.0 * 4.0));
+  emit(F("% FS)"));
+  emitln();
 
   delay(1000ul);
 }

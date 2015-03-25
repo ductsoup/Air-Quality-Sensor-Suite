@@ -3,6 +3,16 @@
 // Checkout sketch for SM-PWM-01A particle sensor 
 // Written by ductsoup, public domain
 //
+#define CONSOLE
+#ifdef CONSOLE
+#include <Console.h>
+#define emit(s) Console.print(s);
+#define emitln(s) Console.println(s);
+#else
+#define emit(s) Serial.print(s);
+#define emitln(s) Serial.println(s);
+#endif
+//
 // Amphenol Advanced Sensors SM-PWM-01A
 // http://www.digikey.com/product-detail/en/SM-PWM-01A/235-1372-ND/5012137
 // Application Notes
@@ -59,9 +69,15 @@ ISR (PCINT0_vect) {
 } 
 
 void setup () { 
+#ifdef CONSOLE
+  Bridge.begin();
+  Console.begin();
+  while (!Console);
+#else
   Serial.begin(115200);
-  delay(5000ul);
-  Serial.println(F("Hello world!"));
+#endif
+  delay(2000);
+  emitln(F("Hello world!"));
 
   // Enable pin change interrupt
   // Note: These values are specific to Arduino Micro, for other devices refer to:  
@@ -88,28 +104,28 @@ void loop() {
   ratio = 0.1 * float(lpo09) / float(SAMPLE_MS);
   conc = 1.1 * ratio * ratio * ratio  - 3.8 * ratio * ratio + 520 * ratio; // + 0.62;
   conc09 = (conc  + conc09 * (FILTER_WEIGHT - 1.0)) / FILTER_WEIGHT;
-  Serial.print(ratio); 
-  Serial.print(F("% >2um, low pulse occupancy time (us) = "));
-  Serial.print(lpo09); 
-  Serial.print(F(" concentration = "));
-  Serial.println(conc);
-  Serial.print(F("Filtered: "));
-  Serial.println(conc09);
+  emit(ratio); 
+  emit(F("% >2um, low pulse occupancy time (us) = "));
+  emit(lpo09); 
+  emit(F(" concentration = "));
+  emitln(conc);
+  emit(F("Filtered: "));
+  emitln(conc09);
   lpo09 = 0;
   
   ratio = 0.1 * float(lpo10) / float(SAMPLE_MS);
   conc = 1.1 * ratio * ratio * ratio  - 3.8 * ratio * ratio + 520 * ratio; // + 0.62;
   conc10 = (conc  + conc10 * (FILTER_WEIGHT - 1.0)) / FILTER_WEIGHT;
-  Serial.print(ratio); 
-  Serial.print(F("% ~1um, low pulse occupancy time (us) = "));
-  Serial.print(lpo10); 
-  Serial.print(F(" concentration = "));
-  Serial.println(conc);
-  Serial.print(F("Filtered: "));
-  Serial.println(conc10);
+  emit(ratio); 
+  emit(F("% ~1um, low pulse occupancy time (us) = "));
+  emit(lpo10); 
+  emit(F(" concentration = "));
+  emitln(conc);
+  emit(F("Filtered: "));
+  emitln(conc10);
   lpo10 = 0;
 
-  Serial.println();
+  emitln();
   delay(SAMPLE_MS);
 }
 

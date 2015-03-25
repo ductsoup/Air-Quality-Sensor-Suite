@@ -1,12 +1,22 @@
 // Example testing sketch for various DHT humidity/temperature sensors
 // Written by ladyada, public domain
+// Updated to use Yun console
+#define CONSOLE
+#ifdef CONSOLE
+#include <Console.h>
+#define emit(s) Console.print(s);
+#define emitln(s) Console.println(s);
+#else
+#define emit(s) Serial.print(s);
+#define emitln(s) Serial.println(s);
+#endif
 
 #include "DHT.h"
 
 #define DHTPIN 11     // what pin we're connected to
 
 // Uncomment whatever type you're using!
-//#define DHTTYPE DHT11   // DHT 11 
+//#define DHTTYPE DHT11   // DHT 11
 #define DHTTYPE DHT22   // DHT 22  (AM2302)
 //#define DHTTYPE DHT21   // DHT 21 (AM2301)
 
@@ -29,10 +39,15 @@ DHT dht(DHTPIN, DHTTYPE);
 //DHT dht(DHTPIN, DHTTYPE, 30);
 
 void setup() {
-  Serial.begin(115200
-  ); 
-  Serial.println("DHTxx test!");
- 
+#ifdef CONSOLE
+  Bridge.begin();
+  Console.begin();
+  while (!Console);
+#else
+  Serial.begin(115200);
+#endif
+  delay(2000);
+  emitln("DHTxx test!");
   dht.begin();
 }
 
@@ -47,10 +62,10 @@ void loop() {
   float t = dht.readTemperature();
   // Read temperature as Fahrenheit
   float f = dht.readTemperature(true);
-  
+
   // Check if any reads failed and exit early (to try again).
   if (isnan(h) || isnan(t) || isnan(f)) {
-    Serial.println("Failed to read from DHT sensor!");
+    emitln("Failed to read from DHT sensor!");
     return;
   }
 
@@ -58,15 +73,16 @@ void loop() {
   // Must send in temp in Fahrenheit!
   float hi = dht.computeHeatIndex(f, h);
 
-  Serial.print("Humidity: "); 
-  Serial.print(h);
-  Serial.print(" %\t");
-  Serial.print("Temperature: "); 
-  Serial.print(t);
-  Serial.print(" *C ");
-  Serial.print(f);
-  Serial.print(" *F\t");
-  Serial.print("Heat index: ");
-  Serial.print(hi);
-  Serial.println(" *F");
+  emit("Humidity: ");
+  emit(h);
+  emitln(" %\t");
+  emit("Temperature: ");
+  emit(t);
+  emit(" *C ");
+  emit(f);
+  emitln(" *F\t");
+  emit("Heat index: ");
+  emit(hi);
+  emitln(" *F");
+  emitln();
 }
