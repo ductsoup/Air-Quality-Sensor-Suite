@@ -134,7 +134,7 @@ void setup(void)
   delay(125000);
 
   p.begin("python");
-  p.addParameter("/mnt/sd/modbus_tcp_slave.py"); // modbus float holding registers
+  p.addParameter("/mnt/sda1/modbus_tcp_slave.py"); // modbus float holding registers
   p.addParameter(RO_START);                      // read only start address
   p.addParameter(RO_LENGTH);                     // read only number of holding registers
   p.addParameter(RW_START);                      // read/write start address (optional)
